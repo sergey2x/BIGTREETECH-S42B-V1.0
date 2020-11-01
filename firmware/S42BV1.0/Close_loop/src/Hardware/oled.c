@@ -60,14 +60,12 @@ void OLED_WR_Byte(uint8_t dat,uint8_t cmd)  //adding some NOPs to reduce jumpyne
 			asm volatile ( "nop":: ); 
 		}
 		else OLED_SDIN_L;
-		
+		asm volatile ( "nop":: );  //makes things worse?
+		asm volatile ( "nop":: ); 
 		
 		OLED_SCLK_H;   // this rising edge of SCLK triggers the sampling by the OLED SSD1306
-		/*asm volatile ( "nop":: ); // get close to 50:50 duty cycle on the clock
-		asm volatile ( "nop":: );
-		asm volatile ( "nop":: );  
-		asm volatile ( "nop":: ); */
-
+		asm volatile ( "nop":: ); // get close to 50:50 duty cycle on the clock
+		
 		dat<<=1;   //shift dat one bit
 	}				 
 	
@@ -240,7 +238,7 @@ void OLED_Init(void)
 	OLED_RST_H; 
 	OLED_WR_Byte(0xAE,OLED_CMD);//
 	OLED_WR_Byte(0xD5,OLED_CMD);//,
-	OLED_WR_Byte(0xF0,OLED_CMD);  // originally d80 changed to 0x00 but 0x80 would be default
+	OLED_WR_Byte(0xF0,OLED_CMD);  // originally d80 changed to 0xF0 (F_OSC: 480-590kHz) to stay away/over 450-460kHz DC buck converter freq. band
 	OLED_WR_Byte(0xA8,OLED_CMD);//
 	OLED_WR_Byte(0X3F,OLED_CMD);//(1/64) 
 	OLED_WR_Byte(0xD3,OLED_CMD);//
