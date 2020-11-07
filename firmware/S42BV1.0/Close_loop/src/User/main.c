@@ -1607,7 +1607,7 @@ void CalibrateEncoder(void)
   int32_t jStart=0;
   int32_t stepNo=0;
   
-  int32_t fullStepReadings[200];//
+  int32_t fullStepReadings[400];//
   int32_t ticks=0;	
   uint32_t address=0x08008000;//
 
@@ -1622,7 +1622,7 @@ void CalibrateEncoder(void)
     LED_L;
 	LL_mDelay(250);	
   } 
-  for(int16_t x=0;x<=199;x++)//
+  for(int16_t x=0;x<=399;x++)//
   {    
     encoderReading=0;
    	LL_mDelay(20);                     
@@ -1651,7 +1651,7 @@ void CalibrateEncoder(void)
   dir=0; 
   OneStep();
   LL_mDelay(1000); 
-  for(int16_t x=199;x>=0;x--)//
+  for(int16_t x=399;x>=0;x--)//
   {    
     encoderReading=0;
    	LL_mDelay(20);                     
@@ -1679,9 +1679,9 @@ void CalibrateEncoder(void)
   }
   LL_TIM_OC_SetCompareCH1(TIM3,0);  
   LL_TIM_OC_SetCompareCH2(TIM3,0); 
-  for(uint8_t i=0;i<200;i++)//
+  for(uint16_t i=0;i<400;i++)//
   {
-    ticks=fullStepReadings[(i+1)%200]-fullStepReadings[i%200];
+    ticks=fullStepReadings[(i+1)%400]-fullStepReadings[i%400];
     if(ticks<-15000) 
       ticks+=16384;
     else if(ticks>15000)	
@@ -1698,9 +1698,9 @@ void CalibrateEncoder(void)
   }
   FlashUnlock();
   FlashErase32K();
-  for(int32_t i=iStart;i<(iStart+200+1);i++)//
+  for(int32_t i=iStart;i<(iStart+400+1);i++)//
   {
-	ticks=fullStepReadings[(i+1)%200]-fullStepReadings[i%200];
+	ticks=fullStepReadings[(i+1)%400]-fullStepReadings[i%400];
     if(ticks<-15000) 
       ticks+=16384;         
     if(i==iStart) 
@@ -1712,7 +1712,7 @@ void CalibrateEncoder(void)
 		address+=2;
       }
     }
-    else if(i==(iStart+200)) 
+    else if(i==(iStart+400))
 	{ 
       for(int32_t j=0;j<jStart;j++) 
 	  {
