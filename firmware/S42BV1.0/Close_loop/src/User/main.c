@@ -670,14 +670,11 @@ void Changer_StepSize(struct Menu *menu, int16_t val)
 {
   uint8_t newVal;
 
-  if (val > 0)
-  {
+  if (val > 0){
     newVal = *(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value >> 1;
     if (newVal >= menu->items[menu->selectedItemIndex]->variable.minValue)
       *(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value = newVal;
-  }
-  else
-  {
+  }else{
     newVal = *(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value << 1;
     if (newVal <= menu->items[menu->selectedItemIndex]->variable.maxValue)
       *(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value = newVal;
@@ -736,12 +733,12 @@ void BuildMenu()
 
   Menu_Item_Init(&menuItemStepSize);
   menuItemStepSize.title = "Step Size";
-  menuItemStepSize.type = MENU_ITEM_TYPE_VARIABLE_UINT8;                            
+  menuItemStepSize.type = MENU_ITEM_TYPE_VARIABLE_UINT8;
   menuItemStepSize.variable.value = &stepangle;  
   menuItemStepSize.variable.maxValue = 32;
   menuItemStepSize.variable.minValue = 1; 
   menuItemStepSize.variable.valueConverter = &Converter_Stepsize;
-  menuItemStepSize.variable.change = &Changer_StepSize;             // Override the default value change function        
+  menuItemStepSize.variable.change = &Changer_StepSize;             // Override the default value change function
 
   Menu_Item_Init(&menuItemEnablePin);
   menuItemEnablePin.title = "EN Pin";                   
@@ -1890,60 +1887,51 @@ void CalibrateEncoder(void)
                                                               
   dir=1; 
   Output(0,80);
-  for(uint8_t m=0;m<4;m++)
-  {
+  for(uint8_t m=0;m<4;m++){
     LED_H;
-	  LL_mDelay(250);
+    LL_mDelay(250);
     LED_L;
-	LL_mDelay(250);	
+  LL_mDelay(250);
   } 
-  for(int16_t x=0;x<=399;x++)//
-  {    
+  for(int16_t x=0;x<=399;x++){
     encoderReading=0;
-   	LL_mDelay(20);                     
+    LL_mDelay(20);
     lastencoderReading = ReadAngle();
     // Take 10 readings and then average them     
-    for(uint8_t reading=0; reading < 10; reading++) 
-	  { 
-      currentencoderReading = ReadAngle(); 
+    for(uint8_t reading=0; reading < 10; reading++){
+      currentencoderReading = ReadAngle();
       if(currentencoderReading - lastencoderReading < -8192)
         currentencoderReading += 16384;
       else if(currentencoderReading - lastencoderReading > 8192)
         currentencoderReading -= 16384;
- 
       encoderReading += currentencoderReading;
       LL_mDelay(10);
       lastencoderReading = currentencoderReading;
     }
     encoderReading = encoderReading / 10;
-
     if(encoderReading > 16384)
       encoderReading -= 16384;
     else if(encoderReading < 0)
       encoderReading += 16384;
-
     // Store the encoder reading  
     fullStepReadings[x] = encoderReading;  
-
     OneStep();
-	  LL_mDelay(100); 
+    LL_mDelay(100);
   }
   dir=0; 
   OneStep();
-  LL_mDelay(1000); 
-  for(int16_t x=399;x>=0;x--)//
-  {    
+  LL_mDelay(1000);
+
+  for(int16_t x=399;x>=0;x--){
     encoderReading=0;
-   	LL_mDelay(20);                     
+    LL_mDelay(20);
     lastencoderReading=ReadAngle();     
-    for(uint8_t reading=0;reading<10;reading++) 
-	  { 
-      currentencoderReading=ReadAngle(); 
+    for(uint8_t reading=0;reading<10;reading++){
+      currentencoderReading=ReadAngle();
       if(currentencoderReading-lastencoderReading<-8192)
         currentencoderReading+=16384;
       else if(currentencoderReading-lastencoderReading>8192)
         currentencoderReading-=16384;
- 
       encoderReading+=currentencoderReading;
       LL_mDelay(10);
       lastencoderReading=currentencoderReading;
@@ -1953,74 +1941,61 @@ void CalibrateEncoder(void)
       encoderReading-=16384;
     else if(encoderReading<0)
       encoderReading+=16384;
-
     // Average current samples with previous samples  
     fullStepReadings[x]=(fullStepReadings[x]+encoderReading)/2;  
     OneStep();
-	LL_mDelay(100); 
+    LL_mDelay(100); 
   }
 
-  LL_TIM_OC_SetCompareCH1(TIM3,0);  
-  LL_TIM_OC_SetCompareCH2(TIM3,0); 
-  for(uint16_t i=0;i<400;i++)//
-  {
+  LL_TIM_OC_SetCompareCH1(TIM3,0);
+  LL_TIM_OC_SetCompareCH2(TIM3,0);
+
+  for(uint16_t i=0;i<400;i++){
     ticks=fullStepReadings[(i+1)%400]-fullStepReadings[i%400];
     if(ticks<-15000) 
       ticks+=16384;
     else if(ticks>15000)	
-	  ticks-=16384;	
-
-    for(int32_t j=0;j<ticks;j++) 
-	  {
+      ticks-=16384;
+    for(int32_t j=0;j<ticks;j++){
       stepNo=(fullStepReadings[i]+j)%16384;
-      if(stepNo==0) 
-      {
+      if(stepNo==0){
         iStart=i;
         jStart=j;
       }
     }
   }
-
   FlashUnlock();
   FlashErase32K();
-  for(int32_t i=iStart;i<(iStart+400+1);i++)//
-  {
-	ticks=fullStepReadings[(i+1)%400]-fullStepReadings[i%400];
-    if(ticks<-15000) 
-      ticks+=16384;         
-    if(i==iStart) 
-	  { 
-      for(int32_t j=jStart;j<ticks;j++) 
-	    {
+
+  for(int32_t i=iStart;i<(iStart+400+1);i++){
+    ticks=fullStepReadings[(i+1)%400]-fullStepReadings[i%400];
+    if(ticks<-15000)
+      ticks+=16384;
+    if(i==iStart){
+      for(int32_t j=jStart;j<ticks;j++){
         lookupAngle=(8192*i+8192*j/ticks)%1638400/100;
-		    FlashWriteHalfWord(address,(uint16_t)lookupAngle);
-		    address+=2;
+        FlashWriteHalfWord(address,(uint16_t)lookupAngle);
+        address+=2;
       }
-    }
-    else if(i==(iStart+400))
-	{ 
-      for(int32_t j=0;j<jStart;j++) 
-	    {
+    } else if(i==(iStart+400)){
+      for(int32_t j=0;j<jStart;j++){
         lookupAngle=((8192*i+8192*j/ticks)%1638400)/100;
-		    FlashWriteHalfWord(address,(uint16_t)lookupAngle);
-		    address+=2;
+        FlashWriteHalfWord(address,(uint16_t)lookupAngle);
+        address+=2;
       }
-    }
-    else 
-	  {                        //this is the general case
-      for(int32_t j=0;j<ticks;j++) 
-      {
+    } else{//this is the general case
+      for(int32_t j=0;j<ticks;j++){
         lookupAngle=((8192*i+8192*j/ticks)%1638400)/100;
-		    FlashWriteHalfWord(address,(uint16_t)lookupAngle);
-		    address+=2;
+        FlashWriteHalfWord(address,(uint16_t)lookupAngle);
+        address+=2;
       }
     }
   }
   FlashLock();
-  if(Second_Calibrate_flag !=1)
-  {                             
-    flash_store_flag =1;            //
-    table1[0] =0xAA;                // 
+
+  if(Second_Calibrate_flag !=1){
+    flash_store_flag =1;
+    table1[0] =0xAA;
     table1[1] =128;
     table1[2] =16;
     table1[3] =4;
@@ -2029,11 +2004,11 @@ void CalibrateEncoder(void)
     table1[6] =1;
     table1[7] =1;
     table1[8] =1;
-    table1[11]=kp;                  //
+    table1[11]=kp;
     table1[12]=ki;
     table1[13]=kd;
   
-    Calibration_flag =0xAA;    //
+    Calibration_flag =0xAA;
 //    Second_Menu=1;             // 
     STMFLASH_Write(Data_Store_Address,table1,14);//
   }
