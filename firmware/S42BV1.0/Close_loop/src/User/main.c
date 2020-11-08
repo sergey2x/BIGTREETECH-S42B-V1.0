@@ -802,6 +802,7 @@ int main(void)
     
     OLED_Clear();                              
     OLED_ShowString(0,0,"   TrueStep   ");
+    OLED_ShowString(0,16,"RoboForum.ru mod");
     MX_SPI1_Init();
     MX_TIM3_Init();
 
@@ -818,8 +819,8 @@ int main(void)
     //Calibration_flag = 0xAA;
 
     if(Calibration_flag == 0xAA){
-        OLED_ShowString(0,25,"  Calibration  ");
-        OLED_ShowString(40,45,"  OK!");
+        OLED_ShowString(0,32,"  Calibration  ");
+        OLED_ShowString(40,48,"  OK!");
         LL_mDelay(500);
                                             
         Reset_status_flag=1;                                
