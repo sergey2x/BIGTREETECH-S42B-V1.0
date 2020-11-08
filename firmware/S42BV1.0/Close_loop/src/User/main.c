@@ -1797,14 +1797,14 @@ void Output(int32_t theta, uint8_t effort)
 }
 
 
-// Takes a step of which the size is provided in milli-degrees (max 1800m°) 
+// Takes a step of which the size is provided in milli-degrees (max 900m°) 
 void FineStep(uint16_t stepSize_mdeg, uint16_t current_mA )
 {
   // This function is currently used more for testing and analysis purposes.
 
   // Limited to a full step size
-  if (stepSize_mdeg > 1800)
-    stepSize_mdeg = 1800;
+  if (stepSize_mdeg > 900)
+    stepSize_mdeg = 900;
 
   // Set current max limit
   if (current_mA > 1600)
@@ -1830,7 +1830,7 @@ void FineStep(uint16_t stepSize_mdeg, uint16_t current_mA )
 }
 
 
-// Take one full step (1.8°)
+// Take one full step (0.9°)
 void OneStep(void)
 {          
   if(dir) 
@@ -1838,7 +1838,7 @@ void OneStep(void)
   else 
     stepnumber-=1;
   
-  // The sine table is 4096 elements long. A single 1.8° step would be a 90° electrical 
+  // The sine table is 4096 elements long. A single 0.9° step would be a 90° electrical 
   // shift, which is 1024 elements. The output function has a multiplier of 12.5 so to 
   // move a single step we need to move 1024 / 12.5 = 81.92 units. 
   Output(81.92f * stepnumber, 80);     
