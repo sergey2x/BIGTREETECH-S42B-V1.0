@@ -660,7 +660,7 @@ uint16_t Converter_Current(uint16_t valueIn)
 // Convert to microstep ratio
 uint16_t Converter_Stepsize(uint16_t valueIn)
 {
-  uint16_t valueOut = 64 / valueIn;
+  uint16_t valueOut = 32 / valueIn;
   return valueOut;
 }
 
@@ -728,7 +728,7 @@ void BuildMenu()
   menuItemCurrent.title = "Current";
   menuItemCurrent.type = MENU_ITEM_TYPE_VARIABLE_UINT8;
   menuItemCurrent.variable.value = &Currents;
-  menuItemCurrent.variable.maxValue = 300;                          // Limit max current to just below 2A
+  menuItemCurrent.variable.maxValue = 255;                          // Limit max current to just below 1.6A
   menuItemCurrent.variable.stepValue = 25;
   menuItemCurrent.variable.valueConverter = &Converter_Current;
 
@@ -1872,12 +1872,12 @@ void CalibrateEncoder(void)
   uint32_t address=0x08008000;//
 
   uint16_t lookupAngle;
-		
-  // Disable DIR en EN interrupts while calibrating, to be tested still...  
-  //enmode=0;
-  //NVIC_DisableIRQ(EXTI0_1_IRQn);
-  //NVIC_DisableIRQ(EXTI2_3_IRQn);
-                                                              
+
+  // Disable DIR en EN interrupts while calibrating
+  enmode=0;
+  NVIC_DisableIRQ(EXTI0_1_IRQn);
+  NVIC_DisableIRQ(EXTI2_3_IRQn);
+
   dir=1; 
   Output(0,80);
   for(uint8_t m=0;m<4;m++){
@@ -2006,8 +2006,8 @@ void CalibrateEncoder(void)
     STMFLASH_Write(Data_Store_Address,table1,14);//
   }
   
-  //NVIC_EnableIRQ(EXTI0_1_IRQn);
-  //NVIC_EnableIRQ(EXTI2_3_IRQn);
+    NVIC_EnableIRQ(EXTI0_1_IRQn);
+    NVIC_EnableIRQ(EXTI2_3_IRQn);
 
   CalibrateEncoder_finish_flag=1; //  
 }
