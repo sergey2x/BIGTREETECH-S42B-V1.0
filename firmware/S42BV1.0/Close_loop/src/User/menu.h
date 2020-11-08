@@ -42,6 +42,7 @@ struct menuItemVariable
     void *value;        
     uint16_t maxValue;
     uint16_t minValue;
+    uint16_t stepValue;
     // Function to modify value
     valChangeFunc_t change;
     // Used to convert value displayed

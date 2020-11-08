@@ -729,6 +729,7 @@ void BuildMenu()
   menuItemCurrent.type = MENU_ITEM_TYPE_VARIABLE_UINT8;
   menuItemCurrent.variable.value = &Currents;
   menuItemCurrent.variable.maxValue = 300;                          // Limit max current to just below 2A
+  menuItemCurrent.variable.stepValue = 25;
   menuItemCurrent.variable.valueConverter = &Converter_Current;
 
   Menu_Item_Init(&menuItemStepSize);

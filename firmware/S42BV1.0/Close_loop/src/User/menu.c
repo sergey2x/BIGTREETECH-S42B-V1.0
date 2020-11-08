@@ -94,6 +94,7 @@ void Menu_Item_Init(struct menuItem *item)
 {
     item->variable.maxValue         = 9999;                     // Default maximum value
     item->variable.minValue         = 0;                        // Default minimum value
+    item->variable.stepValue        = 1;                        // Default step for change value
     item->variable.valueConverter   = NULL;                     
     item->variable.change           = &Menu_Variable_Change;    // Point to default change function
 }
@@ -149,37 +150,40 @@ void Menu_Show(struct Menu *menu)
 void Menu_Button_Up(struct Menu *menu)
 {
     if (menu->items[menu->selectedItemIndex]->inEditMode)
-        menu->items[menu->selectedItemIndex]->variable.change(menu, 1);
+        menu->items[menu->selectedItemIndex]->variable.change(menu, menu->items[menu->selectedItemIndex]->variable.stepValue);
     else
         Menu_Select_Previous(menu);
 }
 
 
-void Menu_Button_Down(struct Menu *menu)
-{
+void Menu_Button_Down(struct Menu *menu){
     if (menu->items[menu->selectedItemIndex]->inEditMode)
-        menu->items[menu->selectedItemIndex]->variable.change(menu, -1);
+        menu->items[menu->selectedItemIndex]->variable.change(menu, -(menu->items[menu->selectedItemIndex]->variable.stepValue));
     else
         Menu_Select_Next(menu);
 }
 
 
-void Menu_Variable_Change(struct Menu *menu, int16_t val)
-{
-    if (menu->items[menu->selectedItemIndex]->type == MENU_ITEM_TYPE_VARIABLE_UINT8)
-    {
-        // Check if increase would be above the maximum value
-        if ((*(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value + val) <= (menu->items[menu->selectedItemIndex]->variable.maxValue))
-            if ((*(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value + val) >= (menu->items[menu->selectedItemIndex]->variable.minValue))
-                *(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value += val;
-    }
-    if (menu->items[menu->selectedItemIndex]->type == MENU_ITEM_TYPE_VARIABLE_UINT16)
-    {
-        // Check if increase would be above the maximum value
-        if ((*(uint16_t*)menu->items[menu->selectedItemIndex]->variable.value + val) <= (menu->items[menu->selectedItemIndex]->variable.maxValue))
-            if ((*(uint16_t*)menu->items[menu->selectedItemIndex]->variable.value + val) >= (menu->items[menu->selectedItemIndex]->variable.minValue))
-                *(uint16_t*)menu->items[menu->selectedItemIndex]->variable.value += val;
-    }
+void Menu_Variable_Change(struct Menu *menu, int16_t val){
+  int16_t maxVal = menu->items[menu->selectedItemIndex]->variable.maxValue;
+  int16_t minVal = menu->items[menu->selectedItemIndex]->variable.minValue;
+  int16_t newVal;
+  if (menu->items[menu->selectedItemIndex]->type == MENU_ITEM_TYPE_VARIABLE_UINT8){
+    newVal = *(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value + val;
+    if (newVal > maxVal)
+      newVal = maxVal;
+    if (newVal < minVal)
+      newVal = minVal;
+    *(uint8_t*)menu->items[menu->selectedItemIndex]->variable.value = newVal;
+  }
+  if (menu->items[menu->selectedItemIndex]->type == MENU_ITEM_TYPE_VARIABLE_UINT16){
+    newVal = *(uint16_t*)menu->items[menu->selectedItemIndex]->variable.value + val;
+    if (newVal > maxVal)
+      newVal = maxVal;
+    if (newVal < minVal)
+      newVal = minVal;
+    *(uint16_t*)menu->items[menu->selectedItemIndex]->variable.value = newVal;
+  }
 }
 
 
