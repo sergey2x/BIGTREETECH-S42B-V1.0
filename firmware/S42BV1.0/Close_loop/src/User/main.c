@@ -1662,10 +1662,9 @@ static void MX_GPIO_Init(void)
 }
 
 
-void SetModeCheck(void)
-{
+void SetModeCheck(void){
   WriteValue(WRITE_MOD2_VALUE,MOD2_VALUE);
-  
+
   // Read status register
   uint16_t state=ReadState();
   // Check for Magnitude out of limit error
@@ -1703,28 +1702,26 @@ loop: if(CAL==0)
     if(CLOSE==0 )//|| Motor_mode==0
     {//
         closemode=1;
-    #if 1       
+    #if 1
         r=*(volatile uint16_t*)((ReadValue(READ_ANGLE_VALUE)>>1)*2+0x08008000); 
-        s_sum=r;   //
+        s_sum=r;
         y=r;
         y_1=y;
-        yw=y;  
+        yw=y;
         yw_1=yw;
     #endif
-    }
-    else{
-        closemode=0;
+    } else{
+      closemode=0;
     }
 
-    if(CalibrateEncoder_finish_flag ==1)
-    {   
-        CalibrateEncoder_finish_flag=0; 
-        Second_Calibrate_flag=0;
-        Prompt_show();               //
-        for(;;){
-            LED_F;
-            LL_mDelay(200);
-        }
+    if(CalibrateEncoder_finish_flag ==1){
+      CalibrateEncoder_finish_flag=0;
+      Second_Calibrate_flag=0;
+      Prompt_show();
+      for(;;){
+        LED_F;
+        LL_mDelay(200);
+      }
     }
 //    else{
 //        NVIC_EnableIRQ(EXTI0_1_IRQn);
@@ -1758,9 +1755,9 @@ void Output(int32_t theta, uint8_t effort)
 	
   int16_t angle_1;
   int16_t angle_2;
-		
+
   float phase_multiplier = 12.5f;                     // Multiply theta by 12.5 Not really sure what the purpose of this is?
-                                                      
+
   angle_1 = Mod(phase_multiplier * theta, 4096);
   angle_2 = angle_1 + 1024;                           // Sin to Cos conversion (1024 = 90°)
   if(angle_2 > 4096)
@@ -1774,33 +1771,27 @@ void Output(int32_t theta, uint8_t effort)
   // is scaled by 1024. So to normalize to 1, the value is divided by 1024.
   v_coil_A = effort * sin_coil_A / 1024;
   v_coil_B = effort * sin_coil_B / 1024;
-	
+
   // Set the TIM3 PWM duty for channel2 and switch the H-Bridge
-  if(v_coil_A>=0)  
-  {
-    LL_TIM_OC_SetCompareCH2(TIM3,v_coil_A);  
-	  IN1_HIGH;                                         
-    IN2_LOW;                                          
+  if(v_coil_A>=0){
+    LL_TIM_OC_SetCompareCH2(TIM3,v_coil_A);
+    IN1_HIGH;
+    IN2_LOW;
+  } else{
+    LL_TIM_OC_SetCompareCH2(TIM3,-v_coil_A);
+    IN1_LOW;
+    IN2_HIGH;
   }
-  else  
-  {
-    LL_TIM_OC_SetCompareCH2(TIM3,-v_coil_A);  
-	  IN1_LOW;     
-    IN2_HIGH;  
-  } 
 
   // Set the TIM3 PWM duty for channel1 and switch the H-Bridge
-  if(v_coil_B>=0)  
-  {
-    LL_TIM_OC_SetCompareCH1(TIM3,v_coil_B);  
-	  IN3_HIGH;  
-    IN4_LOW;  
-  }
-  else 
-  {
-    LL_TIM_OC_SetCompareCH1(TIM3,-v_coil_B); 
-	  IN3_LOW;     
-    IN4_HIGH;    
+  if(v_coil_B>=0){
+    LL_TIM_OC_SetCompareCH1(TIM3,v_coil_B);
+    IN3_HIGH;
+    IN4_LOW;
+  } else{
+    LL_TIM_OC_SetCompareCH1(TIM3,-v_coil_B);
+    IN3_LOW;
+    IN4_HIGH;
   }
 }
 
@@ -2020,8 +2011,7 @@ void CalibrateEncoder(void)
   CalibrateEncoder_finish_flag=1; //  
 }
 //
-void Prompt_show(void)
-{
+void Prompt_show(void){
     OLED_Clear();
     //OLED_ShowString(0,0,"              ");
     OLED_ShowString(0,16,"   finished!  ");

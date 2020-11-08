@@ -183,8 +183,7 @@ void Menu_Variable_Change(struct Menu *menu, int16_t val)
 }
 
 
-void Menu_Select_Next(struct Menu *menu)
-{
+void Menu_Select_Next(struct Menu *menu){
     if (menu->selectedItemIndex >= menu->itemCount - 1)
         return;
 
