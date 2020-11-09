@@ -1095,7 +1095,6 @@ void SetModeCheck(void)
     //         LL_mDelay(200);
     //     }
     // }
->>>>>>> refs/remotes/swanepoeljan-TrueStep/master
 //    else{
 //        NVIC_EnableIRQ(EXTI0_1_IRQn);
 //        NVIC_EnableIRQ(EXTI2_3_IRQn);
