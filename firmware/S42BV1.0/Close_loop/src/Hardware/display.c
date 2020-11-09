@@ -55,8 +55,9 @@ void Changer_StepSize(struct Menu *menu, int16_t val)
 
 void ShowStartupScreen()
 {
-    OLED_Clear();                              
+    OLED_Clear();
     OLED_ShowString(0,0,"   TrueStep   ");
+    OLED_ShowString(0,16,"Roboforum.ru mod");
 }
 
 
@@ -71,16 +72,15 @@ void ShowInfoScreen()
 void ShowCalibrateScreen()
 {
     OLED_Clear();  
-    OLED_ShowString(48,16,"NOT");
-    OLED_ShowString(16,32,"Calibrated");
+    OLED_ShowString(0,32,"NOT Calibrated");
     OLED_ShowString(0,48,"Please Calibrate");
 }
 
 
 void ShowCalibrateOKScreen()
 {
-    OLED_ShowString(16,25,"Calibration");
-    OLED_ShowString(48,45,"OK!");
+    OLED_ShowString(16,32,"Calibration");
+    OLED_ShowString(48,48,"OK!");
 }
 
 
