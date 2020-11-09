@@ -39,6 +39,7 @@ void OLED_WR_Byte(u8 dat,u8 cmd)
 void OLED_WR_Byte(uint8_t dat,uint8_t cmd)
 {	
 	uint8_t i;	
+	//LL_TIM_DisableCounter(TIM6);				//JaSw: Maybe helps with OLED issues but haven't tested yet.
     if(cmd)    
         OLED_RS_H; 
     else 
@@ -53,7 +54,8 @@ void OLED_WR_Byte(uint8_t dat,uint8_t cmd)
 		dat<<=1;   
 	}				 
 	OLED_CS_H;		  
-	OLED_RS_H;   	  
+	OLED_RS_H;  
+	//LL_TIM_EnableCounter(TIM6); 	  
 } 
 #endif	     
 
@@ -233,7 +235,8 @@ void OLED_Init(void)
 	OLED_RST_H; 
 	OLED_WR_Byte(0xAE,OLED_CMD);//
 	OLED_WR_Byte(0xD5,OLED_CMD);//,
-	OLED_WR_Byte(0x00,OLED_CMD);  //	Modification proposed by Till (Quas7). Changed 80 to 0x00
+	OLED_WR_Byte(oledClock,OLED_CMD);
+	//OLED_WR_Byte(0x00,OLED_CMD);  //	Modification proposed by Till (Quas7). Changed 80 to 0x00
 	OLED_WR_Byte(0xA8,OLED_CMD);//
 	OLED_WR_Byte(0X3F,OLED_CMD);//(1/64) 
 	OLED_WR_Byte(0xD3,OLED_CMD);//
@@ -262,4 +265,18 @@ void OLED_Init(void)
 	LL_mDelay(100);
 	OLED_Clear();
 }  
+
+
+// Change Display Clock Divide Ratio/ Oscillator Frequency
+void OLED_SetDisplayClock(uint8_t val)
+{
+	// Turn display off
+	OLED_WR_Byte(0xAE,OLED_CMD);
+
+	OLED_WR_Byte(0xD5,OLED_CMD);
+	OLED_WR_Byte(val,OLED_CMD);
+
+	// Turn display back on again
+	OLED_WR_Byte(0xAF,OLED_CMD);
+}
 

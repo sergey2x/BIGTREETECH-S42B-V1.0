@@ -100,6 +100,9 @@ void TIM6_IRQHandler(void)
     // Kick the dog
     LL_IWDG_ReloadCounter(IWDG);
 
+    // Increase counter (used elsewhere for 100us ticks)
+    tim6Counter++;
+
     if(enmode==1)
     {
       if(closemode==1) 
@@ -173,6 +176,8 @@ void TIM6_IRQHandler(void)
         dterm = LPFA * dterm / 128 - LPFB * kd * (yw - yw_1) / 8;
         u=(kp * pid_e + iterm + dterm) / 128; //PID
         
+        // JaSw: Lyk of advance die verskil tussen die vorige en huidige hoek is wat gemaal word met n konstante. Dit word dan gebruik as theta
+        // en die uitset van die PID (u) word dan die effort.
         //For feedforward angle calculation, change 1.5 to 2 can increase the speed a little, if the motor is easy to run and lose, change to 1.2
         advance=(yw-yw_1)*2;//前馈角计算，1.5改为2可以提高些转速，如果电机容易跑丢改为1.2 
         y_1=y;  
@@ -242,10 +247,16 @@ void TIM6_IRQHandler(void)
         r_1 = r;
       }
       
+      // Disable motor speed calculation while in tuning mode.
+      // This is to make sure this controller loop uses the minimum time.
+      if (!tuningMode)
+      {
         Motor_speed_count++;
-          if(start_measu_V_flag==1){
+          if(start_measu_V_flag==1)
+          {
               Data_update_Count++;
-              if(Data_update_Count>=10000){       //
+              if(Data_update_Count>=10000)
+              {       //
                   Data_update_Count=0;
                   wap1=wap2;
                   wap2=wrap_count;
@@ -254,7 +265,8 @@ void TIM6_IRQHandler(void)
                   
               }
           }
-          if(Motor_speed_count>=2000){
+          if(Motor_speed_count>=2000)
+          {
               Motor_speed_count-=2000;
               Data_update_flag=1;           //
               
@@ -262,8 +274,9 @@ void TIM6_IRQHandler(void)
               start_measu_V_flag=1;
               if(wap1== wap2) start_measu_V_flag=0; 
           }
-      }
+      }   
     }
+  }
 }
 
 
